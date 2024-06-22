@@ -22,7 +22,14 @@ exports.getAllTours = async (req, res) => {
 
         console.log(req.query, queryObj)
 
-        const query = Tour.find(queryObj);
+        let queryStr = JSON.stringify(queryObj);
+
+        queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, match => `$${match}`);
+        
+        console.log(JSON.parse(queryStr));
+
+        const query = Tour.find(JSON.parse(queryStr));
+
         // Execute the Query
         const tours = await query;
 
@@ -44,7 +51,6 @@ exports.getAllTours = async (req, res) => {
 };
 
 // GET THE TOUR FOR YOUR ID
-
 exports.getTour = async (req, res) => {
     try {
         const tour = await Tour.findById(req.params.id);
