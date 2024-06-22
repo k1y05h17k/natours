@@ -1,34 +1,29 @@
 const Tour = require('./../models/tourModel');
 
-
-// exports.checkBody = (req, res, next) => {
-//     if (!req.body.name || !req.body.price) {
-//         return res.status(400).json({
-//             status: 'fail',
-//             message: 'Missing name or price'
-//         });
-//     }
-//     next();
-// };
-
 // GET ALL TOURS IN THE DATABASE
 exports.getAllTours = async (req, res) => {
     try {
 
         // Build the Query
+        // Filtering
         const queryObj = { ...req.query };
         const excludeFields = ['page', 'sort', 'limit', 'fields'];
         excludeFields.forEach(el => delete queryObj[el]);
 
-        console.log(req.query, queryObj)
-
+        // Advanced Filtering
         let queryStr = JSON.stringify(queryObj);
-
         queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, match => `$${match}`);
-        
-        console.log(JSON.parse(queryStr));
 
-        const query = Tour.find(JSON.parse(queryStr));
+        let query = Tour.find(JSON.parse(queryStr));
+
+        // Sorting
+        if(req.query.sort){
+            const sortBy = req.query.sort.split(',').join(' ');
+            query = query.sort(sortBy);
+        } else {
+            query = query.sort('-createdAt')
+        }
+        //  Limiting
 
         // Execute the Query
         const tours = await query;
