@@ -55,7 +55,11 @@ const tourSchema = new mongoose.Schema({
       type: Date,
       default:Date.now()
     },
-    startDates: [Date] //When the tour Start
+    startDates: [Date], //When the tour Start
+    secretTour:{
+      type: Boolean,
+      default: false
+    }
   },{
     toJSON: {virtuals: true},
     toJObject: {virtuals: true}
@@ -67,6 +71,7 @@ const tourSchema = new mongoose.Schema({
 
   // DOCUMENT MIDDLEWARE: runs before .save() amd .create() .insertMany
 
+  // Create a new variable slug using library slugify
   tourSchema.pre('save', function(next){
     this.slug = slugify(this.name, {lower: true});
     next();
@@ -75,7 +80,26 @@ const tourSchema = new mongoose.Schema({
   tourSchema.post('save', function(doc, next){
       console.log(doc);
       next();
-  })
+  });
+
+  // QUERY MIDDLEWARE
+  // /^find/ Regex to identify find, findOne, findOneAndDelete...
+
+  tourSchema.pre(/^find/, function(next){
+
+    this.find({secretTour:{$ne: true}});
+    this.start = Date.now();
+
+    next();
+  });
+
+  tourSchema.post(/^find/, function(docs, next){
+    
+    console.log(`Query took ${Date.now() - this.start} milliseconds!`);
+    console.log(docs);
+
+    next();
+  });
 
   const Tour = mongoose.model('Tour', tourSchema);
   module.exports = Tour;
@@ -89,7 +113,7 @@ const tourSchema = new mongoose.Schema({
 //     price: 1000
 //   });
   
-// Command save, your functionaly is to create a new tour in mongoDB
+// Command save, your functionally is to create a new tour in mongoDB
 //   newTour.save().then(doc => {
 //     console.log(doc);
 //   }).catch(err=>{
