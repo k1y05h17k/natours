@@ -15,7 +15,7 @@ mongoose.connect(DB, {
     useUnifiedTopology: true,
     useFindAndModify: false
 }).then(() => {// con =>{console.log(con.connections); Show data default of connection with database!
-    console.log('DB connection successfull!');
+    console.log('DB connection successful!');
 });
 
 // READ JSON FILE
@@ -26,7 +26,7 @@ const tours = JSON.parse(fs.readFileSync(`${__dirname}/tours-simple.json`, 'utf-
 const importData = async () => {
     try {
         await Tour.create(tours);
-        console.log('Data sccessfully loaded!');
+        console.log('Data successfully loaded!');
         process.exit();
     } catch (err) {
         console.log(err);
@@ -37,7 +37,7 @@ const importData = async () => {
 const deleteData = async () => {
     try {
         await Tour.deleteMany();
-        console.log('Data sccessfully Deleted!');
+        console.log('Data successfully Deleted!');
         process.exit();
     } catch (err) {
         console.log(err);
