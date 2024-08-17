@@ -74,6 +74,13 @@ userSchema.pre('save', function(next){
     next();
 });
 
+userSchema.pre(/^find/, function(next){
+    // This point to the current query
+    // expression means $ne is not equals to false
+    this.find({active: {$ne: false}});
+    next();
+});
+
 
 userSchema.methods.correctPassword = async function (candidatePassword, userPassword) {
     return await bcrypt.compare(candidatePassword, userPassword);
