@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const validator = require('validator');
 const slugify = require('slugify');
+const User = require('./userModel');
 
 // Model Schema to create tour on db mongo
 
@@ -77,7 +78,34 @@ const tourSchema = new mongoose.Schema({
     secretTour:{
       type: Boolean,
       default: false
-    }
+    },
+    startLocation: {
+      // GeoJson
+      type: {
+        type: String,
+        default: 'Point',
+        enum: ['Point']
+      },
+      coordinates: {
+        type: [Number], 
+        default: [0, 0]
+      },
+      address: String,
+      description: String
+    },
+    locations: [{
+      type:{
+        type: String,
+        default: 'Point',
+        enum: ['Point']
+      },
+      coordinates: [Number],
+      address: String,
+      description: String,
+      day: Number
+
+    }],
+    guides: Array
   },{
     toJSON: {virtuals: true},
     toJObject: {virtuals: true}
@@ -95,10 +123,18 @@ const tourSchema = new mongoose.Schema({
     next();
   });
 
-  tourSchema.post('save', function(doc, next){
-      console.log(doc);
-      next();
+  tourSchema.pre('save',async function(next){
+    const guidesPromises = this.guides.map(async id => User.findById(id)); 
+    this.guides = await Promise.all(guidesPromises);
+    next();
   });
+
+  
+
+  // tourSchema.post('save', function(doc, next){
+  //     console.log(doc);
+  //     next();
+  // });
 
   // QUERY MIDDLEWARE
   // /^find/ Regex to identify find, findOne, findOneAndDelete...
