@@ -120,6 +120,13 @@ const tourSchema = new mongoose.Schema({
     return this.duration / 7;
   });
 
+  // Virtual Populate - Connect 2 models(Review on Tour)
+  tourSchema.virtual('reviews',{
+    ref: 'Review',
+    foreignField: 'tour',
+    localField: '_id'
+  });
+
   // DOCUMENT MIDDLEWARE: runs before .save() amd .create() .insertMany
 
   // Create a new variable slug using library slugify
