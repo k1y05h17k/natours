@@ -1,6 +1,5 @@
 const mongoose = require('mongoose');
 
-// review / rating createAt / ref to tour / ref to user
 const reviewSchema = new mongoose.Schema({
     review:{
         type: String,
