@@ -1,39 +1,10 @@
 const Tour = require('./../models/tourModel');
-const APIFeatures = require('./../utils/apiFeature');
 const catchAsync = require('./../utils/catchAsync');
 const AppError = require('./../utils/appError');
 const factory = require('./handlerFactory');
-// List top five Tours
-exports.aliasTopTours = async = (req, res, next) => {
-    try {
-        req.query.limit = '5';
-        req.query.sort = '-ratingsAverage, price';
-        req.query.fields = 'name, price, ratingsAverage, summary, difficulty';
-        next();
-    } catch (err) {
-        res.status(404).json({
-            status: 'fail',
-            message: err
-        });
-    }
-}
 
 // GET ALL TOURS IN THE DATABASE
-exports.getAllTours = catchAsync(async (req, res, next) => {
-
-    // Execute the Query
-    const feature = new APIFeatures(Tour.find(), req.query).filter().sort().limit().paginate()
-    const tours = await feature.query;
-
-    // Send Response success
-    res.status(200).json({
-        status: 'success',
-        results: tours.length,
-        data: {
-            tours
-        }
-    });
-});
+exports.getAllTours = factory.getAll(Tour);
 
 // GET THE TOUR FOR YOUR ID
 exports.getTour = factory.getOne(Tour, { path: 'reviews' })
@@ -46,21 +17,6 @@ exports.updateTour = factory.updateOne(Tour);
 
 // DELETE THE TOUR FOR THE ID
 exports.deleteTour = factory.deleteOne(Tour);
-
-// exports.deleteTour = catchAsync(async (req, res, next) => {
-
-//     const tour = await Tour.findByIdAndDelete(req.params.id);
-
-//     if (!tour) {
-//         return next(new AppError('No tour found with that ID', 404))
-//     }
-
-//     res.status(204).json({
-//         status: 'success',
-//         data: ''
-//     });
-
-// });
 
 // Verify how many items exits in database
 exports.getTourStats = catchAsync(async (req, res, next) => {
@@ -137,3 +93,18 @@ exports.getMonthlyPlan = catchAsync(async (req, res, next) => {
         }
     });
 });
+
+// List top five Tours
+exports.aliasTopTours = async = (req, res, next) => {
+    try {
+        req.query.limit = '5';
+        req.query.sort = '-ratingsAverage, price';
+        req.query.fields = 'name, price, ratingsAverage, summary, difficulty';
+        next();
+    } catch (err) {
+        res.status(404).json({
+            status: 'fail',
+            message: err
+        });
+    }
+}
